@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rihal">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="rihal-icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="rihal-icon-180.png">
+  <title>رِحال — طلبات المكاتب</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: #19333a;
+      background: #f7f5ef;
+      --ink: #19333a;
+      --teal: #176c68;
+      --teal-dark: #105551;
+      --muted: #72838a;
+      --line: #e6e8e2;
+      --paper: #fffefa;
+    }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; background: radial-gradient(ellipse at 8% 0%, #e6efeb 0, transparent 28rem), radial-gradient(ellipse at 96% 28%, #fae8dc 0, transparent 23rem), #f7f5ef; }
+    button, a { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #176c6838; outline-offset: 2px; }
+    .page { width: min(1120px, calc(100% - 56px)); margin: auto; padding: 24px 0 48px; }
+    header { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .brand-icon { display: block; width: 48px; height: 48px; border-radius: 16px; box-shadow: 0 6px 16px #173c421f; }
+    .brand-name { display: block; font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
+    .brand-tagline { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; font-weight: 500; }
+    .actions { display: flex; gap: 8px; }
+    .button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; padding: 0 14px; border: 1px solid var(--line); border-radius: 13px; background: white; color: #52646b; font-size: 13px; font-weight: 650; text-decoration: none; transition: background .16s ease, transform .16s ease; }
+    .button:hover { transform: translateY(-1px); background: #f4f8f4; }
+    .button.primary { border-color: var(--teal); background: var(--teal); color: white; }
+    .button.primary:hover { background: var(--teal-dark); }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin: 42px 0 24px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border: 1px solid #dce8df; border-radius: 30px; background: #f2f7f2; color: var(--teal); font-size: 12px; font-weight: 750; }
+    .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: #72a58c; content: ""; }
+    h1 { margin: 12px 0 8px; color: var(--ink); font-size: clamp(32px, 5vw, 46px); letter-spacing: -1.2px; }
+    .intro p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; }
+    .count { flex: 0 0 auto; padding: 12px 16px; border: 1px solid #e5e5dd; border-radius: 14px; background: var(--paper); color: var(--teal); font-size: 13px; font-weight: 750; box-shadow: 0 7px 20px #1838400b; }
+    .orders { display: grid; gap: 14px; }
+    .order, .empty, .error { border: 1px solid #e7e8e1; border-radius: 20px; background: var(--paper); box-shadow: 0 16px 42px #1838400c; }
+    .order { padding: 22px; transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+    .order:hover { transform: translateY(-1px); box-shadow: 0 20px 46px #18384012; }
+    .order.highlight { border-color: #78aaa0; box-shadow: 0 0 0 4px #176c6812, 0 15px 40px #1838400c; }
+    .order-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding-bottom: 17px; border-bottom: 1px solid #edf0eb; }
+    .destination { margin: 0 0 7px; color: var(--ink); font-size: 21px; }
+    .meta { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .badge { display: inline-flex; min-height: 29px; align-items: center; padding: 0 11px; border: 1px solid #d9e9dc; border-radius: 20px; background: #f0f7f0; color: var(--teal); font-size: 11px; font-weight: 750; }
+    .details { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 18px 0; }
+    .detail-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 11px; }
+    .detail-value { color: #28434a; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+    .notes { margin: 0 0 15px; padding: 12px 14px; border: 1px solid #ebeee7; border-radius: 12px; background: #f7f8f4; color: #465e61; font-size: 13px; line-height: 1.7; }
+    .order-foot { display: flex; align-items: center; justify-content: flex-start; gap: 12px; }
+    .empty, .error { padding: 44px 20px; text-align: center; }
+    .empty strong, .error strong { display: block; margin-bottom: 7px; color: var(--ink); font-size: 17px; }
+    .empty p, .error p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .empty .button { margin-top: 17px; }
+    @media (max-width: 850px) {
+      .page { width: min(760px, calc(100% - 36px)); padding-top: 20px; }
+      .intro { margin-top: 35px; }
+      .details { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 650px) {
+      .page { width: calc(100% - 24px); padding: 12px 0 max(20px, env(safe-area-inset-bottom)); }
+      .brand-icon { width: 42px; height: 42px; border-radius: 14px; }
+      .brand-name { font-size: 17px; }
+      .brand-tagline { font-size: 10px; }
+      .actions { gap: 6px; }
+      .button { min-height: 39px; padding: 0 11px; font-size: 12px; }
+      .intro { align-items: flex-start; flex-direction: column; gap: 13px; margin: 26px 2px 18px; }
+      .eyebrow { padding: 6px 10px; font-size: 11px; }
+      h1 { margin: 11px 0 6px; font-size: clamp(30px, 8vw, 39px); }
+      .intro p { font-size: 13px; }
+      .count { padding: 9px 12px; font-size: 12px; }
+      .order { padding: 16px; border-radius: 17px; }
+      .order-head { gap: 10px; padding-bottom: 13px; }
+      .destination { font-size: 18px; }
+      .meta { font-size: 11px; }
+      .details { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px 10px; padding: 15px 0; }
+      .detail-label { font-size: 10px; }
+      .detail-value { font-size: 12px; }
+      .badge { min-height: 26px; padding: 0 8px; font-size: 10px; }
+    }
+    @media (max-width: 370px) {
+      .page { width: calc(100% - 18px); }
+      .brand { gap: 8px; }
+      .actions { gap: 5px; }
+      .button { padding: 0 8px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <a class="brand" href="index.html" aria-label="Rihal home">
+        <img class="brand-icon" src="rihal-icon.svg" alt="">
+        <span><span class="brand-name" id="brand-name">رِحال</span><span class="brand-tagline" id="brand-tagline">رحلتك تبدأ ببساطة</span></span>
+      </a>
+      <div class="actions">
+        <a class="button" href="index.html" id="home-link">صفحة العميل</a>
+        <button class="button" id="language" type="button">English</button>
+      </div>
+    </header>
+    <section class="intro">
+      <div>
+        <div class="eyebrow" id="eyebrow">لوحة مكاتب السفر</div>
+        <h1 id="title">طلبات الرحلات</h1>
+        <p id="subtitle">الطلبات التي أكدها العملاء، جاهزة لمراجعة فريق المكتب.</p>
+      </div>
+      <div class="count" id="count"></div>
+    </section>
+    <section class="orders" id="orders" aria-live="polite"></section>
+  </main>
+  <script>
+    const translations = {
+      ar: {
+        home: "صفحة العميل", eyebrow: "لوحة مكاتب السفر", title: "طلبات الرحلات",
+        subtitle: "الطلبات التي أكدها العملاء، جاهزة لمراجعة فريق المكتب.",
+        count: (n) => `${n} طلب`, new: "طلب جديد", reviewed: "تمت المراجعة",
+        requestId: "رقم الطلب", received: "وقت الاستلام", tripType: "نوع الرحلة",
+        roundTrip: "ذهاب وعودة", oneWay: "ذهاب فقط", departure: "المغادرة", returning: "العودة",
+        travelers: "المسافرون", adults: (n) => `${n} بالغ`, children: (n) => `${n} طفل`,
+        budget: "الميزانية", flight: "الرحلة الجوية", direct: "مباشر", any: "أي خيار",
+        hotelLabel: "تصنيف الفندق", hotel: (n) => n ? `${n} نجوم` : "بدون تفضيل", notes: "ملاحظات العميل",
+        markReviewed: "تحديد كمُراجع", emptyTitle: "ما فيه طلبات لحد الآن",
+        emptyText: "طلبات العملاء المؤكدة راح تظهر هنا.", storageTitle: "تعذر تحميل الطلبات",
+        storageText: "تأكد من فتح الصفحتين في نفس المتصفح ثم حدّث الصفحة.", updateError: "تعذر تحديث حالة الطلب.",
+        dateLocale: "ar"
+      },
+      en: {
+        home: "Customer page", eyebrow: "Travel office dashboard", title: "Trip requests",
+        subtitle: "Customer-confirmed requests, ready for your team to review.",
+        count: (n) => `${n} request${n === 1 ? "" : "s"}`, new: "New request", reviewed: "Reviewed",
+        requestId: "Request ID", received: "Received", tripType: "Trip type",
+        roundTrip: "Round-trip", oneWay: "One-way", departure: "Departure", returning: "Return",
+        travelers: "Travelers", adults: (n) => `${n} adult${n === 1 ? "" : "s"}`, children: (n) => `${n} child${n === 1 ? "" : "ren"}`,
+        budget: "Budget", flight: "Flight preference", direct: "Direct", any: "Any option",
+        hotelLabel: "Hotel rating", hotel: (n) => n ? `${n} stars` : "No preference", notes: "Customer notes",
+        markReviewed: "Mark as reviewed", emptyTitle: "No requests yet",
+        emptyText: "Confirmed customer requests will appear here.", storageTitle: "Couldn't load requests",
+        storageText: "Open both pages in the same browser, then refresh this page.", updateError: "Couldn't update request status.",
+        dateLocale: "en"
+      }
+    };
+    const storageKey = "rihal.officeRequests.v1";
+    let language = document.documentElement.lang === "en" ? "en" : "ar";
+    let statusError = "";
+    const t = (key) => translations[language][key];
+    function element(tag, className, content) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      if (content !== undefined) el.textContent = content;
+      return el;
+    }
+    function formatDate(value) {
+      return new Intl.DateTimeFormat(t("dateLocale"), { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+    }
+    function formatReceived(value) {
+      return new Intl.DateTimeFormat(t("dateLocale"), { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+    }
+    function detail(container, label, value) {
+      const item = element("div");
+      item.append(element("span", "detail-label", label), element("span", "detail-value", value));
+      container.append(item);
+    }
+    function render() {
+      document.documentElement.lang = language;
+      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+      document.title = language === "ar" ? "رِحال — طلبات المكاتب" : "Rihal — Office requests";
+      document.getElementById("home-link").textContent = t("home");
+      document.getElementById("brand-name").textContent = language === "ar" ? "رِحال" : "Rihal";
+      document.getElementById("brand-tagline").textContent = language === "ar" ? "رحلتك تبدأ ببساطة" : "Travel, made simple";
+      document.getElementById("eyebrow").textContent = t("eyebrow");
+      document.getElementById("title").textContent = t("title");
+      document.getElementById("subtitle").textContent = t("subtitle");
+      document.getElementById("language").textContent = language === "ar" ? "English" : "العربية";
+      const list = document.getElementById("orders");
+      list.innerHTML = "";
+      try {
+        const saved = localStorage.getItem(storageKey);
+        const requests = saved ? JSON.parse(saved) : [];
+        if (!Array.isArray(requests)) throw new Error("Stored travel requests are not a list.");
+        document.getElementById("count").textContent = t("count")(requests.length);
+        if (statusError) {
+          const errorMessage = element("div", "error");
+          errorMessage.append(element("strong", "", statusError));
+          list.append(errorMessage);
+          statusError = "";
+        }
+        if (!requests.length) {
+          const empty = element("div", "empty");
+          empty.append(element("strong", "", t("emptyTitle")), element("p", "", t("emptyText")));
+          const link = element("a", "button", t("home"));
+          link.href = "index.html";
+          empty.append(link);
+          list.append(empty);
+          return;
+        }
+        const focusId = new URLSearchParams(location.search).get("request");
+        requests.forEach((request) => list.append(renderOrder(request, request.request_id === focusId)));
+      } catch (error) {
+        console.error("Could not read travel requests for the office dashboard.", error);
+        document.getElementById("count").textContent = "";
+        const message = element("div", "error");
+        message.append(element("strong", "", t("storageTitle")), element("p", "", t("storageText")));
+        list.append(message);
+      }
+    }
+    function renderOrder(request, highlighted) {
+      const card = element("article", `order${highlighted ? " highlight" : ""}`);
+      const heading = element("div", "order-head");
+      const titleArea = element("div");
+      titleArea.append(element("h2", "destination", request.destination || "—"));
+      titleArea.append(element("div", "meta", `${t("requestId")}: ${request.request_id || "—"} · ${t("received")}: ${formatReceived(request.created_at)}`));
+      const badge = element("span", "badge", request.office_status === "reviewed" ? t("reviewed") : t("new"));
+      heading.append(titleArea, badge);
+      const details = element("div", "details");
+      detail(details, t("tripType"), request.trip_type === "round_trip" ? t("roundTrip") : t("oneWay"));
+      detail(details, t("departure"), formatDate(request.departure_date));
+      if (request.trip_type === "round_trip" && request.return_date) detail(details, t("returning"), formatDate(request.return_date));
+      detail(details, t("travelers"), `${t("adults")(request.travelers.adults)}${request.travelers.children ? `, ${t("children")(request.travelers.children)}` : ""}`);
+      detail(details, t("budget"), `${request.budget.amount} ${request.budget.currency}`);
+      detail(details, t("flight"), request.preferences.flight_preference === "direct" ? t("direct") : t("any"));
+      detail(details, t("hotelLabel"), t("hotel")(request.preferences.hotel_stars));
+      card.append(heading, details);
+      if (request.preferences.special_notes) {
+        card.append(element("p", "notes", `${t("notes")}: ${request.preferences.special_notes}`));
+      }
+      if (request.office_status !== "reviewed") {
+        const footer = element("div", "order-foot");
+        const mark = element("button", "button", t("markReviewed"));
+        mark.type = "button";
+        mark.addEventListener("click", () => markReviewed(request.request_id));
+        footer.append(mark);
+        card.append(footer);
+      }
+      return card;
+    }
+    function markReviewed(requestId) {
+      try {
+        const requests = JSON.parse(localStorage.getItem(storageKey) || "[]");
+        if (!Array.isArray(requests)) throw new Error("Stored travel requests are not a list.");
+        const request = requests.find((item) => item.request_id === requestId);
+        if (!request) throw new Error(`Travel request ${requestId} was not found.`);
+        request.office_status = "reviewed";
+        localStorage.setItem(storageKey, JSON.stringify(requests));
+        render();
+      } catch (error) {
+        console.error("Could not update travel request status.", error);
+        statusError = t("updateError");
+        render();
+      }
+    }
+    document.getElementById("language").addEventListener("click", () => {
+      language = language === "ar" ? "en" : "ar";
+      render();
+    });
+    render();
+  </script>
+</body>
+</html>

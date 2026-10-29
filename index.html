@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f5ef">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Rihal">
+  <link rel="manifest" href="app.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="rihal-icon.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="rihal-icon-180.png">
+  <title>رِحال — خطّط لرحلتك</title>
+  <style>
+    :root {
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      color: #19333a;
+      background: #f7f5ef;
+      --ink: #19333a;
+      --muted: #72838a;
+      --line: #e6e8e2;
+      --paper: #fffefa;
+      --teal: #176c68;
+      --teal-dark: #105551;
+      --coral: #e88164;
+      --mint: #e8f2ed;
+      --shadow: 0 24px 70px #18384012;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 8% 0%, #e6efeb 0, transparent 28rem),
+        radial-gradient(ellipse at 96% 28%, #fae8dc 0, transparent 23rem),
+        #f7f5ef;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #176c6838;
+      outline-offset: 2px;
+    }
+    .page { width: min(1160px, calc(100% - 56px)); margin: auto; padding: 24px 0 48px; }
+    header { display: flex; align-items: center; justify-content: space-between; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: var(--ink); text-decoration: none; }
+    .brand-icon { display: block; width: 48px; height: 48px; border-radius: 16px; box-shadow: 0 6px 16px #173c421f; }
+    .brand-name { display: block; font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
+    .brand-tagline { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; font-weight: 500; }
+    .header-actions { display: flex; align-items: center; gap: 9px; }
+    .quiet-button { min-height: 42px; padding: 0 15px; border: 1px solid #e1e5df; border-radius: 13px; background: #fffefa; color: #52646b; font-size: 13px; font-weight: 650; transition: background .16s ease, transform .16s ease; }
+    .quiet-button:hover { transform: translateY(-1px); background: white; }
+    .intro { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 32px; margin: 42px auto 27px; }
+    .intro-copy { max-width: 650px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 11px; border: 1px solid #dce8df; border-radius: 30px; background: #f2f7f2; color: var(--teal); font-size: 12px; font-weight: 750; }
+    .eyebrow::before { width: 7px; height: 7px; border-radius: 50%; background: #72a58c; content: ""; }
+    h1 { margin: 14px 0 10px; color: var(--ink); font-size: clamp(36px, 5vw, 56px); letter-spacing: -1.8px; line-height: 1.12; }
+    .intro p { max-width: 540px; margin: 0; color: var(--muted); font-size: 15px; line-height: 1.8; }
+    .hero-note { display: flex; min-width: 208px; align-items: center; gap: 12px; padding: 15px 17px; border: 1px solid #e8e5db; border-radius: 17px; background: #fffefaad; }
+    .hero-note-icon { display: grid; width: 40px; height: 40px; flex: 0 0 40px; place-items: center; border-radius: 13px; background: #fff0e8; color: #c8674f; font-size: 19px; }
+    .hero-note strong { display: block; color: var(--ink); font-size: 13px; }
+    .hero-note span:last-child { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1fr) 292px; gap: 20px; max-width: 1080px; margin: auto; align-items: start; }
+    .chat, .side { overflow: hidden; border: 1px solid #e7e8e1; border-radius: 23px; background: var(--paper); box-shadow: var(--shadow); }
+    .chat-head { display: flex; align-items: center; justify-content: space-between; padding: 17px 21px; border-bottom: 1px solid #eff0ec; }
+    .assistant { display: flex; align-items: center; gap: 11px; }
+    .avatar { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 15px; background: #edf4ef; }
+    .avatar img { width: 31px; height: 31px; }
+    .assistant strong { display: block; color: var(--ink); font-size: 14px; }
+    .status { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .status::before { display: inline-block; width: 6px; height: 6px; margin-inline-end: 6px; border-radius: 50%; background: #69a77f; content: ""; }
+    .count { padding: 7px 10px; border-radius: 10px; background: #f4f6f2; color: #526c68; direction: ltr; unicode-bidi: isolate; font-size: 12px; font-weight: 700; }
+    .track { height: 3px; background: #f1f1ec; }
+    .fill { width: 8%; height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--teal), #73a992); transition: width .25s ease; }
+    .messages { display: flex; min-height: 300px; max-height: 480px; flex-direction: column; gap: 14px; overflow-y: auto; padding: 22px 22px 17px; scroll-behavior: smooth; overscroll-behavior: contain; }
+    .bubble { max-width: min(88%, 550px); padding: 12px 15px; border-radius: 17px; font-size: 14px; line-height: 1.75; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .bot { align-self: flex-start; border: 1px solid #ebeee8; border-start-start-radius: 6px; background: #f7f8f4; color: #2d4549; }
+    .user { align-self: flex-end; border-start-end-radius: 6px; background: var(--teal); color: white; box-shadow: 0 5px 13px #176c6824; }
+    .response { padding: 0 22px 21px; animation: show .2s ease-out; }
+    @keyframes show { from { transform: translateY(5px); opacity: 0; } to { transform: none; opacity: 1; } }
+    form { display: grid; gap: 10px; }
+    .row { display: flex; gap: 9px; }
+    .row > * { min-width: 0; flex: 1; }
+    .input, select, textarea { width: 100%; min-height: 49px; padding: 0 14px; border: 1px solid #dce3de; border-radius: 13px; background: #fff; color: var(--ink); font-size: 14px; transition: border-color .16s ease, box-shadow .16s ease; }
+    .input:focus, select:focus, textarea:focus { border-color: #75a69a; box-shadow: 0 0 0 3px #176c6814; outline: none; }
+    input[type="date"] { direction: ltr; text-align: start; }
+    textarea { min-height: 92px; padding: 12px 14px; resize: vertical; }
+    input::placeholder, textarea::placeholder { color: #9aa8a6; }
+    .primary, .choice { min-height: 47px; padding: 0 17px; border: 0; border-radius: 13px; font-size: 13px; font-weight: 750; transition: transform .16s ease, box-shadow .16s ease, background .16s ease; }
+    .primary { background: var(--teal); color: white; box-shadow: 0 7px 16px #176c6826; }
+    .primary:hover { transform: translateY(-1px); background: var(--teal-dark); box-shadow: 0 9px 19px #176c6833; }
+    .choice { border: 1px solid #e0e6e1; background: white; color: #315057; }
+    .choice:hover { transform: translateY(-1px); border-color: #95b8aa; background: #f3f8f4; }
+    .choices { display: flex; flex-wrap: wrap; gap: 9px; }
+    .error { min-height: 15px; color: #b94e3d; font-size: 12px; }
+    .side { padding: 22px; }
+    .side h2 { margin: 0; color: var(--ink); font-size: 16px; letter-spacing: -.2px; }
+    .side p { margin: 8px 0 17px; color: var(--muted); font-size: 12px; line-height: 1.75; }
+    .steps { display: grid; gap: 4px; }
+    .step { display: flex; min-height: 39px; align-items: center; gap: 11px; color: #99a5a2; font-size: 12px; transition: color .18s ease; }
+    .step-number { display: grid; width: 26px; height: 26px; flex: 0 0 26px; place-items: center; border: 1px solid #e4e9e4; border-radius: 50%; background: white; color: #84938e; font-size: 11px; }
+    .step.active { color: var(--teal); font-weight: 750; }
+    .step.active .step-number { border-color: var(--teal); background: var(--teal); color: white; box-shadow: 0 3px 9px #176c682b; }
+    .step.done { color: #5f7971; }
+    .step.done .step-number { border-color: #d9e8dd; background: #edf5ef; color: var(--teal); }
+    .privacy { display: flex; gap: 9px; margin-top: 18px; padding-top: 15px; border-top: 1px solid #edf0eb; color: var(--muted); font-size: 11px; line-height: 1.75; }
+    .privacy-mark { color: var(--teal); font-size: 15px; }
+    .success-card { max-width: 470px; margin-top: 8px; padding: 20px; border: 1px solid #d9e9dc; border-radius: 17px; background: #f3f8f2; }
+    .success-card strong { display: block; margin-bottom: 6px; color: var(--teal); font-size: 16px; }
+    .success-card p { margin: 0 0 14px; color: #637670; font-size: 13px; line-height: 1.7; }
+    .office-link { display: inline-flex; min-height: 44px; align-items: center; padding: 0 16px; border-radius: 12px; background: var(--teal); color: white; font-size: 13px; font-weight: 750; text-decoration: none; }
+    .office-link:hover { background: var(--teal-dark); }
+    @media (max-width: 850px) {
+      .page { width: min(760px, calc(100% - 36px)); padding-top: 20px; }
+      .intro { margin-top: 35px; }
+      .layout { grid-template-columns: minmax(0, 1fr) 245px; gap: 14px; }
+      .side { padding: 18px; }
+    }
+    @media (max-width: 680px) {
+      body { background: radial-gradient(ellipse at 20% 0%, #eaf0e9 0, transparent 23rem), #f7f5ef; }
+      .page { width: min(100% - 24px, 560px); padding: 12px 0 max(20px, env(safe-area-inset-bottom)); }
+      header { min-height: 47px; }
+      .brand-icon { width: 42px; height: 42px; border-radius: 14px; }
+      .brand-name { font-size: 17px; }
+      .brand-tagline { font-size: 10px; }
+      .header-actions { gap: 6px; }
+      .quiet-button { min-height: 39px; padding: 0 11px; font-size: 12px; }
+      .intro { grid-template-columns: 1fr; gap: 14px; margin: 24px 2px 17px; }
+      .intro-copy { max-width: none; }
+      .eyebrow { padding: 6px 10px; font-size: 11px; }
+      h1 { margin: 11px 0 7px; font-size: clamp(33px, 9vw, 43px); letter-spacing: -1.2px; }
+      .intro p { font-size: 13px; line-height: 1.7; }
+      .hero-note { width: fit-content; min-width: 0; padding: 9px 12px; border-radius: 13px; }
+      .hero-note-icon { width: 34px; height: 34px; flex-basis: 34px; border-radius: 11px; font-size: 16px; }
+      .hero-note strong { font-size: 12px; }
+      .hero-note span:last-child { font-size: 10px; }
+      .layout { grid-template-columns: 1fr; gap: 10px; }
+      .side { order: 0; padding: 10px 12px; border-radius: 15px; box-shadow: none; }
+      .side h2, .side p, .privacy { display: none; }
+      .steps { display: flex; gap: 8px; overflow-x: auto; padding: 1px 0 3px; scrollbar-width: none; }
+      .steps::-webkit-scrollbar { display: none; }
+      .step { min-width: max-content; min-height: 29px; gap: 6px; font-size: 10px; }
+      .step-number { width: 22px; height: 22px; flex-basis: 22px; font-size: 10px; }
+      .chat { border-radius: 19px; box-shadow: 0 12px 32px #18384012; }
+      .chat-head { padding: 12px 14px; }
+      .avatar { width: 36px; height: 36px; border-radius: 13px; }
+      .avatar img { width: 27px; height: 27px; }
+      .assistant strong { font-size: 13px; }
+      .status { font-size: 10px; }
+      .count { padding: 6px 9px; font-size: 11px; }
+      .messages { min-height: clamp(225px, 37vh, 330px); max-height: 43vh; padding: 17px 14px 13px; gap: 11px; }
+      .bubble { max-width: 92%; padding: 10px 12px; border-radius: 15px; font-size: 13px; }
+      .response { padding: 0 14px 15px; }
+      form { gap: 9px; }
+      .input, select, textarea { min-height: 48px; font-size: 16px; }
+      textarea { min-height: 82px; }
+      .primary, .choice { min-height: 45px; padding: 0 13px; font-size: 12px; }
+      .choices { gap: 7px; }
+      .success-card { padding: 16px; }
+    }
+    @media (max-width: 370px) {
+      .page { width: calc(100% - 18px); }
+      .brand { gap: 8px; }
+      .header-actions { gap: 5px; }
+      .quiet-button { padding: 0 8px; font-size: 11px; }
+      .step { font-size: 9px; }
+      .messages { padding-inline: 11px; }
+      .response { padding-inline: 11px; }
+      .row { flex-direction: column; }
+    }
+    @media (min-width: 681px) {
+      .layout { align-items: stretch; }
+      .chat { min-height: 525px; }
+      .messages { min-height: 335px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+    html[dir="ltr"] .bot { border-start-start-radius: 17px; border-start-end-radius: 6px; }
+    html[dir="ltr"] .user { border-start-end-radius: 17px; border-start-start-radius: 6px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <a class="brand" href="index.html" aria-label="Rihal home">
+        <img class="brand-icon" src="rihal-icon.svg" alt="">
+        <span><span class="brand-name" data-copy="brand">رِحال</span><span class="brand-tagline" data-copy="brandTagline">رحلتك تبدأ ببساطة</span></span>
+      </a>
+      <div class="header-actions">
+        <button class="quiet-button" id="restart" type="button" data-copy="restart">ابدأ من جديد</button>
+        <button class="quiet-button" id="language" type="button">English</button>
+      </div>
+    </header>
+    <section class="intro">
+      <div class="intro-copy">
+        <div class="eyebrow" data-copy="eyebrow">مساعدك الشخصي للسفر</div>
+        <h1 data-copy="headline">رحلة أحلى، تبدأ بخطوة.</h1>
+        <p data-copy="subtitle">جاوب على كم سؤال بسيط، وخلي علينا ترتيب طلب رحلتك. واضحة وسهلة من أولها لآخرها.</p>
+      </div>
+      <div class="hero-note">
+        <span class="hero-note-icon" aria-hidden="true">✦</span>
+        <span><strong data-copy="heroNoteTitle">ما تاخذ إلا دقائق</strong><span data-copy="heroNoteText">خطوة واحدة في كل مرة</span></span>
+      </div>
+    </section>
+    <section class="layout">
+      <section class="chat" aria-label="Travel planning chat">
+        <div class="chat-head">
+          <div class="assistant"><span class="avatar" aria-hidden="true"><img src="rihal-icon.svg" alt=""></span><span><strong data-copy="assistant">مساعد رِحال</strong><span class="status" data-copy="status">متاح لمساعدتك</span></span></div>
+          <span class="count" id="count"></span>
+        </div>
+        <div class="track"><div class="fill" id="fill"></div></div>
+        <div class="messages" id="messages" aria-live="polite"></div>
+        <div class="response" id="response"></div>
+      </section>
+      <aside class="side">
+        <h2 data-copy="sideTitle">خطوات بسيطة، ورحلة أوضح</h2>
+        <p data-copy="sideDescription">نجمع التفاصيل الأساسية خطوة بخطوة. تقدر تبدأ من جديد أو تغيّر اللغة بأي وقت.</p>
+        <div class="steps" id="steps"></div>
+        <div class="privacy"><span class="privacy-mark" aria-hidden="true">✦</span><span data-copy="privacy">تظهر لك تفاصيل الرحلة للمراجعة قبل التأكيد.</span></div>
+      </aside>
+    </section>
+  </main>
+  <script>
+    const words = {
+      ar: {
+        brand: "رِحال", brandTagline: "رحلتك تبدأ ببساطة", restart: "ابدأ من جديد", eyebrow: "مساعدك الشخصي للسفر",
+        headline: "رحلة أحلى، تبدأ بخطوة.", subtitle: "جاوب على كم سؤال بسيط، وخلي علينا ترتيب طلب رحلتك. واضحة وسهلة من أولها لآخرها.",
+        heroNoteTitle: "ما تاخذ إلا دقائق", heroNoteText: "خطوة واحدة في كل مرة", assistant: "مساعد رِحال", status: "متاح لمساعدتك",
+        sideTitle: "خطوات بسيطة، ورحلة أوضح", sideDescription: "نجمع التفاصيل الأساسية خطوة بخطوة. تقدر تبدأ من جديد أو تغيّر اللغة بأي وقت.",
+        privacy: "تظهر لك تفاصيل الرحلة للمراجعة قبل التأكيد.",
+        stepNames: ["الوجهة", "نوع الرحلة", "المسافرون", "الميزانية", "التفضيلات", "التأكيد"],
+        hello: "أهلًا! أنا رِحال، وبساعدك تخطّط لرحلتك خطوة بخطوة.",
+        destination: "وين حاب تسافر؟", destinationHint: "مثال: طوكيو، اليابان",
+        tripType: "رحلتك ذهاب وعودة أو ذهاب فقط؟", roundTrip: "ذهاب وعودة", oneWay: "ذهاب فقط",
+        departureDate: "متى تاريخ المغادرة؟", returnDate: "ومتى تاريخ العودة؟", adults: "كم عدد المسافرين البالغين؟",
+        children: "وكم عدد الأطفال؟", budget: "كم ميزانيتك التقريبية للرحلة؟", budgetHint: "المبلغ",
+        currency: "العملة", currencyHint: "اختر العملة", flight: "أي خيار تفضّل للرحلة الجوية؟",
+        direct: "رحلات مباشرة", anyFlight: "أي خيار مناسب", hotel: "كم نجمة تفضّل للفندق؟",
+        anyStars: "بدون تفضيل", stars: (n) => `${n} نجوم`, notes: "هل عندك نشاط أو طلب خاص تحب نعرفه؟",
+        notesHint: "مثال: أماكن مناسبة للأطفال، أو فندق قريب من وسط المدينة", skip: "تخطي",
+        summaryPrompt: "هذا ملخص طلب رحلتك. هل كل التفاصيل صحيحة؟", summaryTitle: "ملخص رحلتك",
+        destinationLabel: "الوجهة", tripLabel: "نوع الرحلة", departLabel: "المغادرة", returnLabel: "العودة",
+        travelersLabel: "المسافرون", budgetLabel: "الميزانية", preferencesLabel: "التفضيلات",
+        adultsCount: (n) => `${n} بالغ`, childrenCount: (n) => `${n} طفل`,
+        confirm: "نعم، أكّد الرحلة", startOver: "ابدأ من جديد",
+        successTitle: "تم تأكيد طلبك بنجاح!",
+        success: "أرسلنا تفاصيل رحلتك إلى صفحة عرض الطلبات الخاصة بمكاتب السفر.",
+        viewOffice: "عرض الطلب للمكاتب", storageError: "ما قدرنا نحفظ الطلب على هذا الجهاز. حاول مرة ثانية.",
+        continue: "متابعة", invalid: "يرجى إدخال قيمة صحيحة للمتابعة.", invalidDate: "اختر تاريخًا صالحًا اليوم أو بعده.",
+        dateOrder: "تاريخ العودة يجب أن يكون بعد تاريخ المغادرة.", directLabel: "مباشر", anyLabel: "أي خيار",
+        noPreference: "بدون تفضيل", dateLocale: "ar", count: (n, total) => `${n} / ${total}`,
+        currencies: [["USD", "دولار أمريكي (USD)"], ["SAR", "ريال سعودي (SAR)"], ["AED", "درهم إماراتي (AED)"], ["EUR", "يورو (EUR)"], ["GBP", "جنيه إسترليني (GBP)"], ["EGP", "جنيه مصري (EGP)"], ["KWD", "دينار كويتي (KWD)"], ["QAR", "ريال قطري (QAR)"], ["BHD", "دينار بحريني (BHD)"], ["OMR", "ريال عُماني (OMR)"], ["JOD", "دينار أردني (JOD)"], ["OTHER", "أخرى"]]
+      },
+      en: {
+        brand: "Rihal", brandTagline: "Travel, made simple", restart: "Start over", eyebrow: "Your personal travel assistant",
+        headline: "A better trip starts simply.", subtitle: "Answer a few easy questions and leave the trip planning to us. Clear and simple, one step at a time.",
+        heroNoteTitle: "Takes just minutes", heroNoteText: "One easy step at a time", assistant: "Rihal assistant", status: "Here to help",
+        sideTitle: "A few steps to a clearer trip", sideDescription: "We'll collect the essentials one step at a time. Restart or change language whenever you like.",
+        privacy: "Your trip details are shown for review before confirmation.",
+        stepNames: ["Destination", "Trip type", "Travelers", "Budget", "Preferences", "Confirm"],
+        hello: "Hi! I'm Rihal, and I'll help you plan one step at a time.",
+        destination: "Where would you like to go?", destinationHint: "e.g. Tokyo, Japan",
+        tripType: "Is this round-trip or one-way?", roundTrip: "Round-trip", oneWay: "One-way",
+        departureDate: "When would you like to depart?", returnDate: "When would you like to return?", adults: "How many adult travelers?",
+        children: "And how many children?", budget: "What's your estimated trip budget?", budgetHint: "Amount",
+        currency: "Currency", currencyHint: "Choose a currency", flight: "Which flight option do you prefer?",
+        direct: "Direct flights", anyFlight: "Any option", hotel: "What hotel star rating do you prefer?",
+        anyStars: "No preference", stars: (n) => `${n} stars`, notes: "Any special activities or requests you'd like us to know?",
+        notesHint: "e.g. family-friendly activities or a hotel near the city center", skip: "Skip",
+        summaryPrompt: "Here's a summary of your trip request. Does everything look right?", summaryTitle: "Trip summary",
+        destinationLabel: "Destination", tripLabel: "Trip type", departLabel: "Departure", returnLabel: "Return",
+        travelersLabel: "Travelers", budgetLabel: "Budget", preferencesLabel: "Preferences",
+        adultsCount: (n) => `${n} adult${n === 1 ? "" : "s"}`, childrenCount: (n) => `${n} child${n === 1 ? "" : "ren"}`,
+        confirm: "Yes, confirm trip", startOver: "Start over",
+        successTitle: "Your request is confirmed!",
+        success: "Your trip details have been sent to the travel offices' request page.",
+        viewOffice: "View office requests", storageError: "We couldn't save the request on this device. Please try again.",
+        continue: "Continue", invalid: "Please enter a valid value to continue.", invalidDate: "Choose a valid date today or later.",
+        dateOrder: "Return date must be after departure date.", directLabel: "Direct", anyLabel: "Any option",
+        noPreference: "No preference", dateLocale: "en", count: (n, total) => `${n} / ${total}`,
+        currencies: [["USD", "US Dollar (USD)"], ["SAR", "Saudi Riyal (SAR)"], ["AED", "UAE Dirham (AED)"], ["EUR", "Euro (EUR)"], ["GBP", "British Pound (GBP)"], ["EGP", "Egyptian Pound (EGP)"], ["KWD", "Kuwaiti Dinar (KWD)"], ["QAR", "Qatari Riyal (QAR)"], ["BHD", "Bahraini Dinar (BHD)"], ["OMR", "Omani Rial (OMR)"], ["JOD", "Jordanian Dinar (JOD)"], ["OTHER", "Other"]]
+      }
+    };
+    const state = { lang: "ar", answers: {}, flow: [], index: 0, confirmed: false, requestId: null };
+    const messages = document.getElementById("messages");
+    const response = document.getElementById("response");
+    const steps = document.getElementById("steps");
+    const today = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    const t = (key) => words[state.lang][key];
+
+    function buildFlow() {
+      state.flow = ["destination", "tripType", "departureDate"];
+      if (state.answers.tripType === "round_trip") state.flow.push("returnDate");
+      state.flow.push("adults", "children", "budget", "currency", "flight", "hotel", "notes", "confirmation");
+    }
+    function addMessage(content, role = "bot") {
+      const el = document.createElement("div");
+      el.className = `bubble ${role}`;
+      el.textContent = content;
+      messages.append(el);
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function progress() {
+      const current = state.flow[state.index] === "confirmation" || state.confirmed ? 5 : state.index < 2 ? 0 : state.index < 4 ? 1 : state.index < 6 ? 2 : state.index < 8 ? 3 : 4;
+      steps.innerHTML = "";
+      t("stepNames").forEach((label, i) => {
+        const el = document.createElement("div");
+        el.className = `step${i === current ? " active" : i < current ? " done" : ""}`;
+        el.innerHTML = `<span class="step-number">${i < current ? "✓" : i + 1}</span><span>${label}</span>`;
+        steps.append(el);
+      });
+      const total = state.flow.length || 11;
+      document.getElementById("count").textContent = t("count")(Math.min(state.index + 1, total), total);
+      document.getElementById("fill").style.width = `${state.confirmed ? 100 : Math.min(95, state.index / total * 100)}%`;
+    }
+    function setLanguage(lang) {
+      state.lang = lang;
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+      document.title = lang === "ar" ? "رِحال — رحلة أحلى تبدأ بخطوة" : "Rihal — Plan your trip";
+      document.querySelectorAll("[data-copy]").forEach((el) => { el.textContent = t(el.dataset.copy); });
+      document.getElementById("language").textContent = lang === "ar" ? "English" : "العربية";
+      if (!state.confirmed && state.index === 0) {
+        messages.innerHTML = "";
+        addMessage(t("hello"));
+        ask();
+      }
+      progress();
+      if (state.confirmed) showConfirmation(state.requestId);
+      else if (state.index > 0) ask();
+    }
+    function choices(items, onSelect) {
+      const list = document.createElement("div");
+      list.className = "choices";
+      items.forEach(([value, label]) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "choice";
+        button.textContent = label;
+        button.addEventListener("click", () => onSelect(value, label), { once: true });
+        list.append(button);
+      });
+      response.append(list);
+    }
+    function answer(value, shown) {
+      const key = state.flow[state.index];
+      const answerKey = { flight: "flightPreference", hotel: "hotelStars", notes: "specialNotes" }[key] || key;
+      state.answers[answerKey] = value;
+      addMessage(shown, "user");
+      state.index++;
+      progress();
+      ask();
+    }
+    function ask() {
+      response.innerHTML = "";
+      if (state.index >= state.flow.length) return;
+      const key = state.flow[state.index];
+      progress();
+      if (key === "confirmation") {
+        addMessage(t("summaryPrompt"));
+        showSummary();
+        return;
+      }
+      addMessage(t(key));
+      if (key === "tripType") {
+        choices([["round_trip", t("roundTrip")], ["one_way", t("oneWay")]], (value, label) => {
+          state.answers.tripType = value;
+          buildFlow();
+          answer(value, label);
+        });
+        return;
+      }
+      if (key === "flight") {
+        choices([["direct", t("direct")], ["any", t("anyFlight")]], (value, label) => answer(value, label));
+        return;
+      }
+      if (key === "hotel") {
+        choices([["", t("anyStars")], ...[3, 4, 5].map((n) => [String(n), t("stars")(n)])], (value, label) => answer(value || null, label));
+        return;
+      }
+      renderForm(key);
+    }
+    function renderForm(key) {
+      const form = document.createElement("form");
+      const error = document.createElement("div");
+      error.className = "error";
+      error.setAttribute("role", "alert");
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.className = "primary";
+      submit.textContent = t("continue");
+      let input;
+      if (key === "budget" || key === "currency") {
+        const row = document.createElement("div");
+        row.className = "row";
+        if (key === "budget") {
+          input = document.createElement("input");
+          input.type = "number";
+          input.min = "0.01";
+          input.step = "0.01";
+          input.inputMode = "decimal";
+          input.placeholder = t("budgetHint");
+          input.className = "input";
+        } else {
+          input = document.createElement("select");
+          input.className = "input";
+          const placeholder = document.createElement("option");
+          placeholder.value = "";
+          placeholder.textContent = t("currencyHint");
+          placeholder.disabled = true;
+          placeholder.selected = true;
+          input.append(placeholder);
+          t("currencies").forEach(([value, label]) => {
+            const option = document.createElement("option");
+            option.value = value;
+            option.textContent = label;
+            input.append(option);
+          });
+        }
+        row.append(input);
+        form.append(row, error, submit);
+      } else if (key === "notes") {
+        input = document.createElement("textarea");
+        input.maxLength = 400;
+        input.placeholder = t("notesHint");
+        const buttons = document.createElement("div");
+        buttons.className = "row";
+        const skip = document.createElement("button");
+        skip.type = "button";
+        skip.className = "choice";
+        skip.textContent = t("skip");
+        skip.addEventListener("click", () => answer(null, t("skip")));
+        buttons.append(submit, skip);
+        form.append(input, error, buttons);
+      } else {
+        input = document.createElement("input");
+        input.type = key.endsWith("Date") ? "date" : key === "destination" ? "text" : "number";
+        input.className = "input";
+        if (key === "destination") {
+          input.placeholder = t("destinationHint");
+          input.maxLength = 120;
+        } else if (input.type === "date") {
+          input.min = today;
+        } else {
+          input.min = key === "adults" ? "1" : "0";
+          input.max = "99";
+          input.step = "1";
+          input.placeholder = "0";
+        }
+        form.append(input, error, submit);
+      }
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const value = input.value.trim();
+        if (key === "notes") {
+          answer(value || null, value || t("skip"));
+          return;
+        }
+        if (!value) {
+          error.textContent = t("invalid");
+          input.focus();
+          return;
+        }
+        if (key === "departureDate" || key === "returnDate") {
+          if (value < today) {
+            error.textContent = t("invalidDate");
+            return;
+          }
+          if (key === "returnDate" && value <= state.answers.departureDate) {
+            error.textContent = t("dateOrder");
+            return;
+          }
+          answer(value, new Intl.DateTimeFormat(words[state.lang].dateLocale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`)));
+          return;
+        }
+        if (key === "adults" || key === "children") {
+          const number = Number(value);
+          if (!Number.isInteger(number) || number < Number(input.min) || number > 99) {
+            error.textContent = t("invalid");
+            input.focus();
+            return;
+          }
+          answer(number, value);
+          return;
+        }
+        if (key === "budget") {
+          const amount = Number(value);
+          if (!Number.isFinite(amount) || amount <= 0) {
+            error.textContent = t("invalid");
+            input.focus();
+            return;
+          }
+          answer(amount, value);
+          return;
+        }
+        const currency = t("currencies").find(([code]) => code === value);
+        answer(value, currency ? currency[1] : value);
+      });
+      response.append(form);
+      if (input) input.focus({ preventScroll: true });
+    }
+    function dateLabel(value) {
+      return new Intl.DateTimeFormat(words[state.lang].dateLocale, { dateStyle: "long", timeZone: "UTC" }).format(new Date(`${value}T00:00:00Z`));
+    }
+    function showSummary() {
+      const a = state.answers;
+      const lines = [
+        `${t("destinationLabel")}: ${a.destination}`,
+        `${t("tripLabel")}: ${a.tripType === "round_trip" ? t("roundTrip") : t("oneWay")}`,
+        `${t("departLabel")}: ${dateLabel(a.departureDate)}`,
+        ...(a.tripType === "round_trip" ? [`${t("returnLabel")}: ${dateLabel(a.returnDate)}`] : []),
+        `${t("travelersLabel")}: ${t("adultsCount")(a.adults)}${a.children ? `، ${t("childrenCount")(a.children)}` : ""}`,
+        `${t("budgetLabel")}: ${a.budget} ${a.currency}`,
+        `${t("preferencesLabel")}: ${a.flightPreference === "direct" ? t("directLabel") : t("anyLabel")}, ${a.hotelStars ? t("stars")(Number(a.hotelStars)) : t("noPreference")}${a.specialNotes ? `\n${a.specialNotes}` : ""}`
+      ];
+      const summary = document.createElement("div");
+      summary.className = "bubble bot";
+      summary.textContent = `${t("summaryTitle")}\n${lines.join("\n")}`;
+      messages.append(summary);
+      messages.scrollTop = messages.scrollHeight;
+      choices([["yes", t("confirm")], ["restart", t("startOver")]], (value) => {
+        if (value === "restart") {
+          restart();
+          return;
+        }
+        state.confirmed = true;
+        addMessage(t("confirm"), "user");
+        submitRequest();
+      });
+    }
+    function createPayload() {
+      const a = state.answers;
+      return {
+        request_status: "confirmed",
+        language: state.lang,
+        destination: a.destination,
+        trip_type: a.tripType,
+        departure_date: a.departureDate,
+        return_date: a.tripType === "round_trip" ? a.returnDate : null,
+        travelers: { adults: a.adults, children: a.children },
+        budget: { amount: a.budget, currency: a.currency },
+        preferences: {
+          hotel_stars: a.hotelStars || null,
+          flight_preference: a.flightPreference,
+          special_notes: a.specialNotes || null
+        }
+      };
+    }
+    function submitRequest() {
+      const payload = createPayload();
+      const requestId = `RH-${Date.now().toString(36).toUpperCase()}`;
+      const request = { ...payload, request_id: requestId, office_status: "new", created_at: new Date().toISOString() };
+      try {
+        const saved = localStorage.getItem("rihal.officeRequests.v1");
+        const requests = saved ? JSON.parse(saved) : [];
+        if (!Array.isArray(requests)) throw new Error("Stored travel requests are not a list.");
+        requests.unshift(request);
+        localStorage.setItem("rihal.officeRequests.v1", JSON.stringify(requests));
+      } catch (error) {
+        console.error("Could not save travel request for office review.", error);
+        response.innerHTML = "";
+        const notice = document.createElement("div");
+        notice.className = "error";
+        notice.textContent = t("storageError");
+        response.append(notice);
+        return;
+      }
+      state.requestId = requestId;
+      state.confirmed = true;
+      progress();
+      showConfirmation(requestId);
+    }
+    function showConfirmation(requestId) {
+      response.innerHTML = "";
+      if (!messages.querySelector(".success")) {
+        const notice = document.createElement("div");
+        notice.className = "bubble bot success";
+        notice.textContent = t("success");
+        messages.append(notice);
+      }
+      const card = document.createElement("section");
+      card.className = "success-card";
+      const title = document.createElement("strong");
+      title.textContent = t("successTitle");
+      const description = document.createElement("p");
+      description.textContent = t("success");
+      const link = document.createElement("a");
+      link.className = "office-link";
+      link.href = "office.html";
+      link.textContent = t("viewOffice");
+      card.append(title, description, link);
+      response.append(card);
+      if (requestId) {
+        link.href = `office.html?request=${encodeURIComponent(requestId)}`;
+      }
+      messages.scrollTop = messages.scrollHeight;
+    }
+    function restart() {
+      state.answers = {};
+      state.index = 0;
+      state.confirmed = false;
+      state.requestId = null;
+      buildFlow();
+      messages.innerHTML = "";
+      response.innerHTML = "";
+      addMessage(t("hello"));
+      progress();
+      ask();
+    }
+    document.getElementById("language").addEventListener("click", () => setLanguage(state.lang === "ar" ? "en" : "ar"));
+    document.getElementById("restart").addEventListener("click", restart);
+    buildFlow();
+    setLanguage("ar");
+  </script>
+</body>
+</html>
